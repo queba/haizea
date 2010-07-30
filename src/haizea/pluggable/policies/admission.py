@@ -70,3 +70,11 @@ class NoARsPolicy(LeaseAdmissionPolicy):
         lease -- Lease request
         """        
         return lease.get_type() != Lease.ADVANCE_RESERVATION
+
+class BreezePolicy(LeaseAdmissionPolicy):
+    def __init__(self, slottable):
+        LeaseAdmissionPolicy.__init__(self, slottable)
+        
+    def accept_lease(self, lease):
+        # for now, we accept all leases
+        return True  
