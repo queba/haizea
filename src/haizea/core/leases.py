@@ -635,7 +635,6 @@ class Lease(object):
             time_on_dedicated = bound
         return time_on_loaded / time_on_dedicated
  
-    
     def estimate_suspend_time(self):
         """ Estimate the time to suspend an entire lease
                             

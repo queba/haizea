@@ -203,3 +203,13 @@ class OpenNebulaXMLRPCClientSingleton(object):
         self.client = OpenNebulaXMLRPCClient(*args, **kwargs)
         
                                              
+def generate_combination(iterable):
+    l = len(iterable)
+    count = 2**l
+    for i in xrange(0, count):
+        comb = []
+        for j, entry in zip(range(l-1, -1, -1), iterable):
+            if (i >> j) & 1:
+                comb.append(entry)
+        yield comb
+

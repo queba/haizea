@@ -149,6 +149,12 @@ class LeaseScheduler(object):
         
         # Get pending leases
         pending_leases = self.leases.get_leases_by_state(Lease.STATE_PENDING)  
+
+        # we process all the leases at one time, without notion of queued leases
+        # and now leases
+        for choice in generate_combination(pending_leases):
+            # we first check if IM leases are feasible
+            im_leases = [l for l in choice if l.get_type() == Lease.IMMEDIATE]
         
         # Process leases that have to be queued. Right now, only best-effort leases get queued.
         queue_leases = [req for req in pending_leases if req.get_type() == Lease.BEST_EFFORT]
@@ -880,6 +886,28 @@ class LeaseScheduler(object):
         self.accounting.at_lease_done(l)
         
         
+    def _get_dominant_resource(self, l):
+        dominant_res = (None, 0)
+
+        resource_amount = {}
+
+        for capacity in l.requested_resources.iteritems():
+            types = capacity.get_resource_types()
+            for t in types:
+                if t not in resource_amount:
+                    resource_amount[t] = sum(capacity.quantity[t])
+                else:
+                    resource_amount[t] += sum(capacity.quantity[t])
+        for res_type, amount in resource_amount.iteritems():
+            share_ratio = amount / float(self.slottable.get_total_capacity( \
+                        res_type) 
+            if share_ratio > dominant_res[1]:
+                dominant_res = (res_type, share_ratio)
+        return dominant_res
+
+
+    def _check_feasibility(self, combination):
+        pass
 
         
 
